@@ -1,11 +1,21 @@
+/*
+ * This ESP32 code is created by esp32io.com
+ *
+ * This ESP32 code is released in the public domain
+ *
+ * For more detail (instruction and wiring diagram), visit https://esp32io.com/tutorials/esp32-temperature-humidity-sensor
+ */
+
+
 #include <WiFi.h>
 #include <HTTPClient.h>
 
 const char* ssid = "mywifiSSID";
 const char* password = "myWiFiPassword";
 
-String serverName = "http://192.168.0.10:3008/room";
-
+// API Server URL
+String serverName = "https://yourApiHosted.com/";
+String jwtToken = "here comes your token";
 
 unsigned long lastTime = 0;
 unsigned long timerDelay = 5000;
@@ -30,8 +40,6 @@ void setup() {
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
- 
-  Serial.println("Timer set to 5 seconds (timerDelay variable), it will take 5 seconds before publishing the first reading.");
 
   
 }
@@ -54,10 +62,11 @@ void loop() {
     http.begin(serverName);
     String stringHumi = String(humi, 2);
     String stringTempC = String(tempC, 2);
+    http.addHeader("Authorization", "Bearer "+jwtToken);
     http.addHeader("Content-Type", "application/json");
     int httpResponseCode = http.POST("{\"temp\": \""+stringTempC+"\", \"umi\": \""+stringHumi+"\"}");
   }
 
-  // wait a 10 seconds between readings (CHANGE FOR 5MIN WHEN GO TO PRODUCTION)
-  delay(300000);
+  // wait a 30 seconds between readings (CHANGE FOR 5MIN WHEN GO TO PRODUCTION)
+  delay(30000);
 }
